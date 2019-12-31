@@ -56,14 +56,15 @@ func buildTraversal(srcRoute string, destRoute string, adjacentRoutes adjacencyM
 		queue.Remove(queue.Front())
 
 		for _, childRoute := range adjacentRoutes[currentRoute] {
-			if !visited[childRoute] {
-				visited[childRoute] = true
-				parents[childRoute] = currentRoute
-				queue.PushBack(childRoute)
+			if visited[childRoute] {
+				continue
+			}
+			visited[childRoute] = true
+			parents[childRoute] = currentRoute
+			queue.PushBack(childRoute)
 
-				if childRoute == destRoute {
-					return parents
-				}
+			if childRoute == destRoute {
+				return parents
 			}
 		}
 	}
@@ -86,16 +87,17 @@ func getConnectingRoutes(fromRoutes []string, toRoutes []string, adjacentRoutes 
 
 			// Traverse the graph and reconstruct the shortest path between routes
 			parents := buildTraversal(fromRoute, toRoute, adjacentRoutes)
-			if len(parents) > 0 {
-				connectionFound = true
-				curRoute := toRoute
-				for curRoute != fromRoute {
-					connections = append([]string{curRoute}, connections...)
-					curRoute = parents[curRoute]
-				}
-				connections = append([]string{fromRoute}, connections...)
-				break
+			if len(parents) == 0 {
+				continue
 			}
+			connectionFound = true
+			curRoute := toRoute
+			for curRoute != fromRoute {
+				connections = append([]string{curRoute}, connections...)
+				curRoute = parents[curRoute]
+			}
+			connections = append([]string{fromRoute}, connections...)
+			break
 		}
 
 		// If a connection has been found, exit the loop, otherwise start over
@@ -166,17 +168,19 @@ func getStopRoutes(mbtaURL url.URL, routes routesResponse, buildRouteAdjacencyMa
 			}
 			stops[stopName].routes = append(stops[stopName].routes, routeName)
 
-			if buildRouteAdjacencyMap {
-				// If a stop has multiple routes, adjust the route adjacency list
-				for _, curRoute := range stops[stopName].routes {
-					if curRoute != routeName {
-						if !contains(adjacentRoutes[curRoute], routeName) {
-							adjacentRoutes[curRoute] = append(adjacentRoutes[curRoute], routeName)
-						}
-						if !contains(adjacentRoutes[routeName], curRoute) {
-							adjacentRoutes[routeName] = append(adjacentRoutes[routeName], curRoute)
-						}
-					}
+			if !buildRouteAdjacencyMap {
+				continue
+			}
+			// If a stop has multiple routes, adjust the route adjacency list
+			for _, curRoute := range stops[stopName].routes {
+				if curRoute == routeName {
+					continue
+				}
+				if !contains(adjacentRoutes[curRoute], routeName) {
+					adjacentRoutes[curRoute] = append(adjacentRoutes[curRoute], routeName)
+				}
+				if !contains(adjacentRoutes[routeName], curRoute) {
+					adjacentRoutes[routeName] = append(adjacentRoutes[routeName], curRoute)
 				}
 			}
 		}
