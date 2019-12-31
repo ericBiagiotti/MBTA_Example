@@ -39,7 +39,7 @@ func buildTraversal(srcRoute string, destRoute string, adjacentRoutes adjacencyM
 	parents := make(map[string]string, len(adjacentRoutes))
 	queue := list.New()
 
-	// Create a dictionary to keep track of visited routes
+	// Create a map to keep track of visited routes
 	visited := make(map[string]bool)
 	for k := range adjacentRoutes {
 		visited[k] = false

@@ -36,7 +36,7 @@ I followed a dead end for a bit on this one. I saw `recommended_trasfers` in the
 ### Question 3 ###
 Because we only need to know the connecting routes between stops, this can be thought of as an undirected graph problem, where each route is a node and if a route shares a stop, there is an edge between them.
 
-The solution uses an adjacency list, which is a hash representations of graphs. For our example, the hash would be keyed by the route name and the value is all the routes it is adjacent to (other routes that share a stop). This is convenient because we already create a hash of stops to routes in `getStopRoutes`, so I modified it to also build the adjacency list.
+The solution uses an adjacency list, which is a hash representation of a graph. For our example, the hash would be keyed by the route name and the value is all the routes it is adjacent to (other routes that share a stop). This is convenient because we already create a hash of stops to routes in `getStopRoutes`, so I modified it to also build the adjacency list.
 
 Given 2 stops from the user, `getConnectingRoutes` iterates over the combinations of starting and destination routes and `buildTraversal` does a breadth-first search of the graph and keeps track of visited routes. `buildTraversal` was translated from https://www.geeksforgeeks.org/shortest-path-unweighted-graph/.
 
@@ -54,4 +54,4 @@ Each function used to answer the 3 questions is unit tested. The test suite crea
 - I am currently using the names of routes and stops as hash keys to simplify things, but this should really be using IDs.
 - Add more edge case and error testing. For example, `getConnectingRoutes` iterates over the combinations of starting and destination routes for any given pair of stops, but the first set of routes will always find a connection given the current MBTA graph. Consequently, the code for handling the case when the first pair of routes don't have a connection but subsequent pairs do is not fully tested.
 - The `http.Get()` function doesn't return an error for non 2xx response codes, so `getAndDecode` should check for different response codes from the MBTA API and log unexpected results.
-- Client side caching of data. The MBTA resources we are concerned with for this example are fairly static. They provide a way to check API v3 supports caching via the `Last-Modified` response and  `If-Modified-Since` request headers.
+- Client side caching of data. The MBTA resources we are concerned with for this example are fairly static. The MBTA API v3 supports caching via the `Last-Modified` response and  `If-Modified-Since` request headers.
